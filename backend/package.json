@@ -1,0 +1,13 @@
+{
+    "name": "backend",
+    "private": true,
+    "version": "1.0.0",
+    "license": "MIT",
+    "dependencies": {
+        "koa": "^2.13.4",
+        "ws": "^8.8.1"
+    },
+    "devDependencies": {
+        "@types/koa": "^2.13.5"
+    }
+}

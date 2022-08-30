@@ -1,0 +1,13 @@
+{
+    "name": "4-play-card",
+    "private": true,
+    "version": "1.0.0",
+    "repository": "https://github.com/lopo12123/4-play-card.git",
+    "author": "lopo",
+    "license": "MIT",
+    "workspaces": [
+        "frontend",
+        "backend",
+        "shared"
+    ]
+}
