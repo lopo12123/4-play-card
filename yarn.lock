@@ -428,6 +428,11 @@ csstype@^2.6.8:
   resolved "http://172.18.66.66:31468/csstype/download/csstype-2.6.20.tgz#9229c65ea0b260cf4d3d997cb06288e36a8d6dda"
   integrity sha512-/WwNkdXfckNgw6S5R125rrW8ez139lBHWouiBvX8dfMFtcn6V81REDqnH7+CRpRipfYlyU1CmOnOxrmGcFOjeA==
 
+cursor-effects@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.npmmirror.com/cursor-effects/-/cursor-effects-1.0.4.tgz#16cceac6cd40198dd96ca3ca5444107af887e8b5"
+  integrity sha512-LWcQHyHyeRfS0u4njd+cipaLUKoE1N9Jg4Rjon5h75TIB4Z4VxF+nX5c/QjXX795EMZoEz6jz8K+U+V4w5wy0A==
+
 debug@^3.2.7:
   version "3.2.7"
   resolved "http://172.18.66.66:31468/debug/download/debug-3.2.7.tgz#72580b7e9145fb39b6676f9c5e5fb100b934179a"
