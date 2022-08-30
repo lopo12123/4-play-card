@@ -4,10 +4,12 @@
     "version": "1.0.0",
     "license": "MIT",
     "dependencies": {
+        "better-sqlite3": "^7.6.2",
         "koa": "^2.13.4",
         "ws": "^8.8.1"
     },
     "devDependencies": {
-        "@types/koa": "^2.13.5"
+        "@types/koa": "^2.13.5",
+        "nodemon": "^2.0.19"
     }
 }

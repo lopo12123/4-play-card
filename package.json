@@ -9,5 +9,8 @@
         "frontend",
         "backend",
         "shared"
-    ]
+    ],
+    "devDependencies": {
+        "typescript": "^4.8.2"
+    }
 }
