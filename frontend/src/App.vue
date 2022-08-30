@@ -1,13 +1,17 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
-    <div class="">
-        hello
+    <div class="logical-root">
+        <router-view/>
     </div>
 </template>
 
 <style lang="scss" scoped>
+@use "src/styles/mixins";
 
+.logical-root {
+    @include mixins.scrollBarStyle();
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
 </style>

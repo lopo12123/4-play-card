@@ -4,13 +4,21 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: 'Root',
-        redirect: 'Welcome'
+        component: () => import("@/App.vue"),
+        redirect: { name: 'welcome' },
+        children: [
+            {
+                path: 'welcome',
+                name: 'Welcome',
+                component: () => import("@/views/Welcome.vue")
+            },
+            {
+                path: 'room',
+                name: 'Room',
+                component: () => import("@/views/Room.vue")
+            }
+        ]
     },
-    {
-        path: '/welcome',
-        name: 'Welcome',
-        component: () => import("@/views/Welcome.vue")
-    }
 ]
 
 export const router = createRouter({
