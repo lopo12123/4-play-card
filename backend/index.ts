@@ -5,9 +5,9 @@ import { HOST, PORT } from "./setting";
 import Koa from "koa";
 import cors from "@koa/cors";
 import { logger } from "./middlewares/logger";
-import { BackgroundColorEnums, colorfulStdout, FontColorEnums, formatDate } from "./misc";
 import { getApiMiddlewares, getIndexMiddlewares } from "./api";
 import { WSServerController } from "./api/wsServer";
+import { BackgroundColorEnums, colorfulStdout, FontColorEnums, formatDate } from "./misc";
 
 // instance
 const app = new Koa();
