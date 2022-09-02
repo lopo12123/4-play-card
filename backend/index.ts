@@ -5,7 +5,8 @@ import { HOST, PORT } from "./setting";
 import Koa from "koa";
 import cors from "@koa/cors";
 import { logger } from "./middlewares/logger";
-import { BackgroundColorEnums, colorfulStdout, FontColorEnums } from "./misc";
+import { BackgroundColorEnums, colorfulStdout, FontColorEnums, formatDate } from "./misc";
+import { getApiMiddlewares, indexMiddlewares } from "./api";
 
 // instance
 const app = new Koa();
@@ -16,18 +17,15 @@ app
     .use(cors())
     // 日志
     .use(logger)
-
-// router
-app.use(ctx => {
-    ctx.response.status = 403
-    ctx.response.body = 'hello koa'
-})
-
-// server
-app.listen(PORT, HOST, () => {
-    colorfulStdout([
-        { message: ' Server ', fontColor: FontColorEnums.green, backgroundColor: BackgroundColorEnums.green },
-        { message: ` http://${ HOST }:${ PORT }` },
-    ])
-    // console.log('\033[42;32m Server \033[40;32m start at ' + 'http://' + HOST + ':' + PORT + '\033[0m')
-})
+    // 首页
+    .use(indexMiddlewares)
+    // 路由
+    .use(getApiMiddlewares())
+    // 启动
+    .listen(PORT, HOST, () => {
+        colorfulStdout([
+            { message: ' Server ', fontColor: FontColorEnums.green, backgroundColor: BackgroundColorEnums.green },
+            { message: ` [${ formatDate() }] `, fontColor: FontColorEnums.lightBlue },
+            { message: `at http://${ HOST }:${ PORT }` },
+        ])
+    })
