@@ -1,12 +1,16 @@
 import { Middleware } from "koa";
-import { formatDate } from "../misc";
+import { colorfulStdout, FontColorEnums, formatDate } from "../misc";
 
 /**
  * @description 响应请求后打印日志
  */
 const logger: Middleware = async (ctx, next) => {
     await next()
-    console.log(`[${ formatDate() }] [${ ctx.method }] from "${ ctx.originalUrl }"`)
+    colorfulStdout([
+        { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
+        { message: ` ${ ctx.method } `, fontColor: FontColorEnums.green },
+        { message: ctx.originalUrl, fontColor: FontColorEnums.blue },
+    ])
 }
 
 export {
