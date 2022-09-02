@@ -25,9 +25,9 @@ app.use(ctx => {
 
 // server
 app.listen(PORT, HOST, () => {
-    console.log(colorfulStdout([
+    colorfulStdout([
         { message: ' Server ', fontColor: FontColorEnums.green, backgroundColor: BackgroundColorEnums.green },
         { message: ` http://${ HOST }:${ PORT }` },
-    ]))
+    ])
     // console.log('\033[42;32m Server \033[40;32m start at ' + 'http://' + HOST + ':' + PORT + '\033[0m')
 })

@@ -60,15 +60,17 @@ export type ColorfulConfig = {
  * @description 设置颜色输出
  */
 export const colorfulStdout = (chunks: ColorfulConfig[]) => {
-    return chunks
-        .map(chunk => {
-            if(!chunk.fontColor && !chunk.backgroundColor)
-                return '\x1b[0m' + chunk.message
-            else if(chunk.fontColor && chunk.backgroundColor)
-                return `\x1b[${ chunk.fontColor };${ chunk.backgroundColor }m${ chunk.message }`
-            else
-                return `\x1b[0m\x1b[${ chunk.fontColor ?? chunk.backgroundColor }m${ chunk.message }`
-        })
-        .join('') + '\x1b[0m'
+    console.log(
+        chunks
+            .map(chunk => {
+                if(!chunk.fontColor && !chunk.backgroundColor)
+                    return '\x1b[0m' + chunk.message
+                else if(chunk.fontColor && chunk.backgroundColor)
+                    return `\x1b[${ chunk.fontColor };${ chunk.backgroundColor }m${ chunk.message }`
+                else
+                    return `\x1b[0m\x1b[${ chunk.fontColor ?? chunk.backgroundColor }m${ chunk.message }`
+            })
+            .join('') + '\x1b[0m'
+    )
 }
 // endregion
