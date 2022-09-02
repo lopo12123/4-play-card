@@ -2,12 +2,12 @@
     "compilerOptions": {
         "target": "ESNext",
         "useDefineForClassFields": true,
-        "module": "ESNext",
+        "module": "CommonJS",
         "moduleResolution": "Node",
+        "allowJs": true,
         "strict": true,
         "jsx": "preserve",
         "sourceMap": true,
-        "allowJs": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
         "esModuleInterop": true,
@@ -17,8 +17,5 @@
         ],
         "skipLibCheck": true,
         "baseUrl": "."
-    },
-    "include": [
-        "index.ts"
-    ]
+    }
 }
