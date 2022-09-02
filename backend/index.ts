@@ -6,7 +6,7 @@ import Koa from "koa";
 import cors from "@koa/cors";
 import { logger } from "./middlewares/logger";
 import { BackgroundColorEnums, colorfulStdout, FontColorEnums, formatDate } from "./misc";
-import { getApiMiddlewares, indexMiddlewares } from "./api";
+import { getApiMiddlewares, getIndexMiddlewares } from "./api";
 
 // instance
 const app = new Koa();
@@ -18,7 +18,7 @@ app
     // 日志
     .use(logger)
     // 首页
-    .use(indexMiddlewares)
+    .use(getIndexMiddlewares())
     // 路由
     .use(getApiMiddlewares())
     // 启动
