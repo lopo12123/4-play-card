@@ -24,8 +24,8 @@ app
     // 启动
     .listen(PORT, HOST, () => {
         colorfulStdout([
-            { message: ' Server ', fontColor: FontColorEnums.green, backgroundColor: BackgroundColorEnums.green },
+            { message: ' ✌ ', fontColor: FontColorEnums.green, backgroundColor: BackgroundColorEnums.green },
             { message: ` [${ formatDate() }] `, fontColor: FontColorEnums.lightBlue },
-            { message: `at http://${ HOST }:${ PORT }` },
+            { message: `\n\n\tserver running at http://${ HOST }:${ PORT }\n`, fontColor: FontColorEnums.green },
         ])
     })
