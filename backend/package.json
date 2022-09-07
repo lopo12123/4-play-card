@@ -5,7 +5,7 @@
     "type": "commonjs",
     "license": "MIT",
     "scripts": {
-        "dev": "nodemon index.ts"
+        "dev:back": "nodemon index.ts"
     },
     "dependencies": {
         "@koa/cors": "^3.4.1",
