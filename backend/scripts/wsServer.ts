@@ -28,11 +28,11 @@ abstract class WSController {
      */
     private static wsPool = new Map<string, [ string, WebSocket ]>()
     /**
-     * @description 房间池
-     * @private
+     * @description 房间池 todo 需要再设计
      */
     private static roomPool = new Map<string, WeakSet<WebSocket>>()
 
+    // region koaApi 调用
     /**
      * @description 获取当前连接数
      */
@@ -57,6 +57,8 @@ abstract class WSController {
     public static roomList() {
         return [ ...this.roomPool.keys() ]
     }
+
+    // endregion
 
     /**
      * @description 存储新连接(如果存在则自动断开旧连接)
