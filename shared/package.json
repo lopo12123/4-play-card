@@ -1,7 +1,6 @@
 {
-    "name": "shared",
+    "name": "@mj/shared",
     "version": "1.0.0",
     "author": "lopo",
-    "license": "MIT",
-    "private": true
+    "license": "MIT"
 }
