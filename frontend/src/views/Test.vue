@@ -1,5 +1,13 @@
 <script lang="ts" setup>
+import { onBeforeUnmount, onMounted } from "vue";
+import { UseWS } from "@/scripts/useWS";
 
+onMounted(() => {
+    UseWS.connect()
+})
+onBeforeUnmount(() => {
+    UseWS.disconnect()
+})
 </script>
 
 <template>
