@@ -10,7 +10,9 @@ abstract class UseWS {
     public static connect(): Promise<void> {
         return new Promise((resolve, reject) => {
             const wsIdIfExist = sessionStorage.getItem('wsId')
-            const search = wsIdIfExist ? `?wsId=${ wsIdIfExist }` : ''
+            const roomIdIfExist = sessionStorage.getItem('roomId')
+            const search = (!!wsIdIfExist && !!roomIdIfExist)
+                ? `?wsId=${ wsIdIfExist }&roomId=${ roomIdIfExist }` : ''
             // const url = new URL(`ws://${ location.host }${ search }`)
             const url = new URL(`ws://${ '127.0.0.1:10087' }${ search }`)
             const _ws = new WebSocket(url)

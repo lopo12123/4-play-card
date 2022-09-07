@@ -8,11 +8,17 @@ const apiRouter = new Router({
 })
 
 apiRouter
-    .get('/ws/count', ctx => {
-        ctx.response.body = WSController.count()
+    .get('/ws/wsCount', ctx => {
+        ctx.response.body = WSController.wsCount()
     })
-    .get('/ws/ids', ctx => {
-        ctx.response.body = WSController.list()
+    .get('/ws/roomCount', ctx => {
+        ctx.response.body = WSController.roomCount()
+    })
+    .get('/ws/wsList', ctx => {
+        ctx.response.body = WSController.wsList()
+    })
+    .get('/ws/roomList', ctx => {
+        ctx.response.body = WSController.roomList()
     })
 // endregion
 

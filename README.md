@@ -7,4 +7,5 @@ new WebSocket('...[?wsId=xxx]')
 
 - `/api`
     - `/ws/count` 获取连接数
-    - `/ws/ids` 获取连接id列表
+    - `/ws/wsList` 获取连接id列表
+    - `/ws/roomList` 获取房间id列表

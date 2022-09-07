@@ -26,7 +26,7 @@ abstract class WSController {
     /**
      * @description 连接池 wsId => [roomId, ws]
      */
-    private static pool = new Map<string, [ string, WebSocket ]>()
+    private static wsPool = new Map<string, [ string, WebSocket ]>()
     /**
      * @description 房间池
      * @private
@@ -36,64 +36,59 @@ abstract class WSController {
     /**
      * @description 获取当前连接数
      */
-    public static count() {
-        return this.pool.size
+    public static wsCount() {
+        return this.wsPool.size
+    }
+
+    /**
+     * @description 获取当前房间数
+     */
+    public static roomCount() {
+        return this.roomPool.size
     }
 
     /**
      * @description 获取全部 wsId 列表
      */
-    public static list() {
-        return [ ...this.pool.keys() ]
+    public static wsList() {
+        return [ ...this.wsPool.keys() ]
+    }
+
+    public static roomList() {
+        return [ ...this.roomPool.keys() ]
     }
 
     /**
      * @description 存储新连接(如果存在则自动断开旧连接)
      * @return 房间id
      */
-    public static addWS(wsId: string, ws: WebSocket): string {
-        const oldIfExist = this.pool.get(wsId)
-        const _roomId = oldIfExist?.[0] ?? UUID()
-        oldIfExist?.[1]?.close()
-        this.pool.set(wsId, [ _roomId, ws ])
-        return _roomId
-    }
-
-    /**
-     * @description 重新连接
-     * @return 房间id
-     */
-    public static reAddWS(wsId: string, ws: WebSocket): string {
-        const oldIfExist = this.pool.get(wsId)
-        const _roomId = oldIfExist?.[0] ?? UUID()
-        oldIfExist?.[1]?.close()
-        this.pool.set(wsId, [ _roomId, ws ])
-        return _roomId
+    public static addWS(wsId: string, roomId: string, ws: WebSocket) {
+        this.wsPool.set(wsId, [ roomId, ws ])
     }
 
     /**
      * @description 获取特定连接
      */
-    public static getWS(wsId: string) {
-        return this.pool.get(wsId) ?? null
+    public static getWS(wsId: string): WebSocket | null {
+        return this.wsPool.get(wsId)?.[1] ?? null
     }
 
     /**
      * @description 断开并移除连接
      */
     public static closeWS(wsId: string) {
-        this.pool.get(wsId)?.[1].close()
-        this.pool.delete(wsId)
+        this.wsPool.get(wsId)?.[1].close()
+        this.wsPool.delete(wsId)
     }
 
     /**
      * @description 断开并移除所有连接
      */
     public static closeAll() {
-        this.pool.forEach(ws => {
+        this.wsPool.forEach(ws => {
             ws[1].close()
         })
-        this.pool.clear()
+        this.wsPool.clear()
     }
 }
 
@@ -116,15 +111,10 @@ abstract class WSSController {
 
         wss.on('connection', (ws, req) => {
             // 如果连接带有 wsId 参数, 则说明是重连
-            let _wsId = req.url?.match(/(?<=wsId=)[0-9a-z-]+/)?.[0]
-            let _roomId = ''
-            if(_wsId) {
-                _roomId = WSController.reAddWS(_wsId, ws)
-            }
-            else {
-                _wsId = UUID()
-                _roomId = WSController.addWS(_wsId, ws)
-            }
+            const _wsId = req.url?.match(/(?<=wsId=)[0-9a-z-]+/)?.[0] ?? UUID()
+            const _roomId = req.url?.match(/(?<=roomId=)[0-9a-z-]+/)?.[0] ?? UUID()
+
+            WSController.addWS(_wsId, _roomId, ws)
             colorfulStdout([
                 { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
                 { message: ' [wss] ', fontColor: FontColorEnums.green },
@@ -140,7 +130,7 @@ abstract class WSSController {
                     ws.send(JSON.stringify({
                         cmd: 'wsId',
                         payload: {
-                            wsId: _wsId!,
+                            wsId: _wsId,
                             roomId: _roomId
                         }
                     } as IMSG_wsId))
@@ -148,7 +138,7 @@ abstract class WSSController {
                 // 其他所有的消息处理
                 else {
                     WSMsgController.solve(
-                        JSON.parse(msg.toString()), _wsId!,
+                        JSON.parse(msg.toString()), _wsId,
                         (msgObj) => {
                             ws.send(JSON.stringify(msgObj))
                         }
@@ -161,18 +151,18 @@ abstract class WSSController {
                 colorfulStdout([
                     { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
                     { message: ' [wss] ', fontColor: FontColorEnums.red },
-                    { message: _wsId!, fontColor: FontColorEnums.blue },
+                    { message: _wsId, fontColor: FontColorEnums.blue },
                     { message: ` Error: ${ err.message }`, fontColor: FontColorEnums.red }
                 ])
             })
 
             // 断开连接
             ws.on('close', () => {
-                WSController.closeWS(_wsId!)
+                WSController.closeWS(_wsId)
                 colorfulStdout([
                     { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
                     { message: ' [wss] ', fontColor: FontColorEnums.yellow },
-                    { message: _wsId!, fontColor: FontColorEnums.blue },
+                    { message: _wsId, fontColor: FontColorEnums.blue },
                     { message: ' disconnect', fontColor: FontColorEnums.yellow }
                 ])
             })
