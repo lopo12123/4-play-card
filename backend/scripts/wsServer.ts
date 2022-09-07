@@ -30,7 +30,7 @@ abstract class WSController {
     /**
      * @description 房间池 todo 需要再设计
      */
-    private static roomPool = new Map<string, WeakSet<WebSocket>>()
+    private static roomPool = new Map<string, WebSocket[]>()
 
     // region koaApi 调用
     /**
@@ -65,7 +65,21 @@ abstract class WSController {
      * @return 房间id
      */
     public static addWS(wsId: string, roomId: string, ws: WebSocket) {
-        this.wsPool.set(wsId, [ roomId, ws ])
+        const room = this.roomPool.get(roomId)
+        // 新建房间
+        if(!room) {
+            this.wsPool.set(wsId, [ roomId, ws ])
+            this.roomPool.set(roomId, [ ws ])
+            return true
+        }
+        // 正常加入
+        else if(room.length >= 4) {
+            this.wsPool.set(wsId, [ roomId, ws ])
+            room.push(ws)
+            return true
+        }
+        // 已满员
+        else return false
     }
 
     /**
