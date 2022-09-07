@@ -9,6 +9,13 @@ const HOST = '127.0.0.1'
  */
 const PORT = 10087
 
+/**
+ * @description 静态资源目录
+ * @type {string}
+ */
+const STATIC_DIR = './static'
+
 module.exports = {
-    HOST, PORT
+    HOST, PORT,
+    STATIC_DIR,
 }

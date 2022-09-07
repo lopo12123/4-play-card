@@ -1,11 +1,12 @@
 // env
-import { HOST, PORT } from "./setting";
+import { HOST, PORT, STATIC_DIR } from "./setting";
 
 // dependencies
 import Koa from "koa";
 import cors from "@koa/cors";
+import staticServer from "koa-static";
 import { logger } from "./middlewares/logger";
-import { getApiMiddlewares, getIndexMiddlewares } from "./api";
+import { getApiMiddlewares } from "./api";
 import { WSServerController } from "./api/wsServer";
 import { BackgroundColorEnums, colorfulStdout, FontColorEnums, formatDate } from "./misc";
 
@@ -17,15 +18,15 @@ const koaServer = app
     .use(cors())
     // 日志
     .use(logger)
-    // 首页
-    .use(getIndexMiddlewares())
+    // 首页 & 静态资源 (放置在 static 目录下)
+    .use(staticServer(STATIC_DIR))
     // 路由
     .use(getApiMiddlewares())
     // 启动
     .listen(PORT, HOST, () => {
         colorfulStdout([
             { message: ' ✌ ', fontColor: FontColorEnums.green, backgroundColor: BackgroundColorEnums.green },
-            { message: ` [${ formatDate() }] `, fontColor: FontColorEnums.lightBlue },
+            { message: ` ${ formatDate() } `, fontColor: FontColorEnums.lightBlue },
             { message: `\n[koa] server running at http://${ HOST }:${ PORT }`, fontColor: FontColorEnums.green },
         ])
 
