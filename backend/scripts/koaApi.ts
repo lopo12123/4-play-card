@@ -1,4 +1,5 @@
 import Router from "@koa/router";
+import { WSController } from "./wsServer";
 
 // region `/api` 接口
 const apiRouter = new Router({
@@ -6,9 +7,13 @@ const apiRouter = new Router({
     strict: true
 })
 
-apiRouter.get('/api-1', ctx => {
-    ctx.response.body = '/123'
-})
+apiRouter
+    .get('/ws/count', ctx => {
+        ctx.response.body = WSController.count()
+    })
+    .get('/ws/ids', ctx => {
+        ctx.response.body = WSController.list()
+    })
 // endregion
 
 /**

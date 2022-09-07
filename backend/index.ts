@@ -6,9 +6,9 @@ import Koa from "koa";
 import cors from "@koa/cors";
 import staticServer from "koa-static";
 import { logger } from "./middlewares/logger";
-import { getApiMiddlewares } from "./api";
-import { WSServerController } from "./api/wsServer";
-import { BackgroundColorEnums, colorfulStdout, FontColorEnums, formatDate } from "./misc";
+import { getApiMiddlewares } from "./scripts/koaApi";
+import { WSSController } from "./scripts/wsServer";
+import { BackgroundColorEnums, colorfulStdout, FontColorEnums, formatDate } from "./scripts/misc";
 
 // instance
 const app = new Koa();
@@ -31,5 +31,5 @@ const koaServer = app
         ])
 
         // 在已有的服务上附加 ws server, 共用端口
-        WSServerController.attachWSServer(koaServer)
+        WSSController.attachWSServer(koaServer)
     })

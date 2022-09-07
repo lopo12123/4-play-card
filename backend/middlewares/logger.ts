@@ -1,5 +1,5 @@
 import { Middleware } from "koa";
-import { colorfulStdout, FontColorEnums, formatDate } from "../misc";
+import { colorfulStdout, FontColorEnums, formatDate } from "../scripts/misc";
 
 /**
  * @description 状态码对应日志的颜色

@@ -7,5 +7,28 @@
     </head>
     <body>
         hello
+
+        <button onclick="wsConn()">conn</button>
+        <button onclick="wsDisconn()">dis-conn</button>
+
+        <script>
+            let wsPool = []
+            const wsConn = () => {
+                const _conn = new WebSocket('ws://127.0.0.1:10087?wsId=123123')
+                wsPool.push(_conn)
+                _conn.onopen = () => {
+                    _conn.send('request id')
+                }
+                _conn.onmessage = (msg) => {
+                    console.log(msg)
+                }
+                _conn.onclose = () => {
+                    console.log('closed')
+                }
+            }
+            const wsDisconn = () => {
+                wsPool.shift()?.close()
+            }
+        </script>
     </body>
 </html>
