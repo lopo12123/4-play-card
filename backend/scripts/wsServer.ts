@@ -54,8 +54,31 @@ abstract class WSController {
         return [ ...this.wsPool.keys() ]
     }
 
+    /**
+     * @description 获取全部 roomId 列表
+     */
     public static roomList() {
         return [ ...this.roomPool.keys() ]
+    }
+
+    /**
+     * @description 获取房间人数 无参则获取全部
+     */
+    public static roomInfo(ids?: string[]): { roomId: string, count: number }[] {
+        if(!ids) {
+            const roomInfo: { roomId: string, count: number }[] = []
+            this.roomPool.forEach((room, roomId) => {
+                roomInfo.push({
+                    roomId, count: room.length
+                })
+            })
+            return roomInfo
+        }
+        else {
+            return ids.map(roomId => {
+                return { roomId, count: this.roomPool.get(roomId)?.length ?? 0 }
+            })
+        }
     }
 
     // endregion
@@ -93,8 +116,21 @@ abstract class WSController {
      * @description 断开并移除连接
      */
     public static closeWS(wsId: string) {
-        this.wsPool.get(wsId)?.[1].close()
-        this.wsPool.delete(wsId)
+        const wsInPool = this.wsPool.get(wsId)
+        if(wsInPool) {
+            wsInPool[1].close()
+
+            // 仅剩一个 => 删除房间
+            if(this.roomPool.get(wsInPool[0])?.length === 1) {
+                this.roomPool.delete(wsInPool[0])
+            }
+            // 不止一个 => 仅删除人员
+            else {
+                this.roomPool.get(wsInPool[0])?.filter(ws => {
+                    return ws !== wsInPool[1]
+                })
+            }
+        }
     }
 
     /**

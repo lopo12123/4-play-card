@@ -20,6 +20,10 @@ apiRouter
     .get('/ws/roomList', ctx => {
         ctx.response.body = WSController.roomList()
     })
+    .get('/ws/roomInfo', ctx => {
+        const ids = ctx.request.query['ids'] as string[] | undefined
+        ctx.response.body = WSController.roomInfo(ids)
+    })
 // endregion
 
 /**
