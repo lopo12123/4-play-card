@@ -1,7 +1,7 @@
 import Router from "@koa/router";
 import { WSController } from "./wsServer";
 
-// region `/api` 接口
+// `/api` 接口
 const apiRouter = new Router({
     prefix: '/api',
     strict: true
@@ -24,7 +24,6 @@ apiRouter
         const ids = ctx.request.query['ids'] as string[] | undefined
         ctx.response.body = WSController.roomInfo(ids)
     })
-// endregion
 
 /**
  * @description 获取接口路由
