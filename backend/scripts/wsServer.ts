@@ -2,18 +2,23 @@ import { Server as HttpServer } from "http";
 import { Server as WSServer, WebSocket, WebSocketServer } from "ws";
 import { v4 as UUID } from "uuid";
 import { colorfulStdout, FontColorEnums, formatDate } from "./misc";
-import { IMSG, IMSG_wsId } from "@mj/shared/wsEv";
+import { MSG_ROOM, MSG_WS, MSG_WS_wsId } from "@mj/shared/wsEv";
 
 /**
  * @description websocket 消息处理
  */
 abstract class WSMsgController {
-    public static solve(msg: Exclude<IMSG, IMSG_wsId>, wsId: string, send: (data: IMSG) => void) {
+    public static solve(msg: MSG_WS) {
+        const { wsId, roomId, data } = msg.payload
+
+        WSController.broadcast(roomId, { sourceId: wsId, msg: data })
+
         // switch(msg.cmd) {
         //     case 'wsId':
-        //         send({ cmd: 'wsId', payload: { wsId, } } as IMSG_wsId)
+        //         send({ cmd: 'wsId', payload: { wsId, } } as MSG_WS_wsId)
         //         break
         //     default:
+        //
         //         break
         // }
     }
@@ -77,6 +82,35 @@ abstract class WSController {
         else {
             return ids.map(roomId => {
                 return { roomId, count: this.roomPool.get(roomId)?.length ?? 0 }
+            })
+        }
+    }
+
+    // endregion
+
+    // region message
+    /**
+     * @description 发送消息给指定连接
+     */
+    public static send(wsId: string, body: any) {
+        const ws = this.wsPool.get(wsId)
+        if(!ws) return false
+        else {
+            ws[1].send(JSON.stringify(body))
+        }
+    }
+
+    /**
+     * @description 房间广播消息
+     */
+    public static broadcast(roomId?: string, body?: MSG_ROOM) {
+        if(!roomId || !body) return false
+
+        const room = this.roomPool.get(roomId)
+        if(!room) return false
+        else {
+            room.forEach(ws => {
+                ws.send(JSON.stringify(body))
             })
         }
     }
@@ -190,25 +224,31 @@ abstract class WSSController {
             else {
                 // 消息处理
                 ws.on('message', (msg) => {
-                    const msgObj = JSON.parse(msg.toString()) as IMSG
-                    // 建立连接后返回 wsId、roomId
-                    if(msgObj.cmd === 'wsId') {
-                        ws.send(JSON.stringify({
-                            cmd: 'wsId',
-                            payload: {
-                                wsId: _wsId,
-                                roomId: _roomId
-                            }
-                        } as IMSG_wsId))
+                    try {
+                        const msgObj = JSON.parse(msg.toString()) as MSG_WS
+
+                        // 建立连接后返回 wsId、roomId
+                        if(msgObj.cmd === 'wsId') {
+                            ws.send(JSON.stringify({
+                                cmd: 'wsId',
+                                payload: {
+                                    wsId: _wsId,
+                                    roomId: _roomId
+                                }
+                            } as MSG_WS_wsId))
+                        }
+                        // 其他所有的消息处理
+                        else {
+                            WSMsgController.solve(msgObj)
+                        }
                     }
-                    // 其他所有的消息处理
-                    else {
-                        WSMsgController.solve(
-                            JSON.parse(msg.toString()), _wsId,
-                            (msgObj) => {
-                                ws.send(JSON.stringify(msgObj))
-                            }
-                        )
+                    catch (e) {
+                        colorfulStdout([
+                            { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
+                            { message: ' [wss] ', fontColor: FontColorEnums.red },
+                            { message: _wsId, fontColor: FontColorEnums.blue },
+                            { message: ' invalid data format', fontColor: FontColorEnums.red },
+                        ])
                     }
                 })
 

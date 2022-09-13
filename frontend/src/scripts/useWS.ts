@@ -1,4 +1,4 @@
-import { IMSG_wsId } from "@mj/shared/wsEv";
+import { MSG_WS_wsId } from "@mj/shared/wsEv";
 
 abstract class UseWS {
     private static ws: WebSocket | null = null
@@ -22,7 +22,7 @@ abstract class UseWS {
                 _ws.send(JSON.stringify({ cmd: 'wsId' }))
             }
             _ws.onmessage = (msg) => {
-                const msgObj = JSON.parse(msg.data) as IMSG_wsId
+                const msgObj = JSON.parse(msg.data) as MSG_WS_wsId
                 sessionStorage.setItem('wsId', msgObj.payload.wsId)
                 sessionStorage.setItem('roomId', msgObj.payload.roomId)
                 resolve()
