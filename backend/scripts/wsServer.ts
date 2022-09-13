@@ -4,6 +4,8 @@ import { v4 as UUID } from "uuid";
 import { colorfulStdout, FontColorEnums, formatDate } from "./misc";
 import { MSG_ROOM, MSG_WS, MSG_WS_wsId, WSChannel } from "@mj/shared/wsEv";
 
+type WSPair = [ string, WebSocket ]
+
 /**
  * @description websocket 消息处理
  */
@@ -13,7 +15,10 @@ abstract class WSMsgController {
 
         switch(msg.cmd) {
             case WSChannel.Chat:
-                WSController.broadcast(roomId, { sourceId: wsId, data: data })
+                WSController.broadcast(roomId, { sourceId: wsId, data: data ?? '' })
+                break
+            case WSChannel.Start:
+                // todo 开始
                 break
             default:
                 // never
@@ -33,7 +38,7 @@ abstract class WSController {
     /**
      * @description 房间池 todo 需要再设计
      */
-    private static roomPool = new Map<string, WebSocket[]>()
+    private static roomPool = new Map<string, [ string, WebSocket ][]>()
 
     // region koaApi 调用
     /**
@@ -65,21 +70,28 @@ abstract class WSController {
     }
 
     /**
-     * @description 获取房间人数 无参则获取全部
+     * @description 获取房间信息 无参则获取全部
      */
-    public static roomInfo(ids?: string[]): { roomId: string, count: number }[] {
+    public static roomInfo(ids?: string[]): { roomId: string, wsList: string[], count: number }[] {
         if(!ids) {
-            const roomInfo: { roomId: string, count: number }[] = []
+            const roomInfo: { roomId: string, wsList: string[], count: number }[] = []
             this.roomPool.forEach((room, roomId) => {
                 roomInfo.push({
-                    roomId, count: room.length
+                    roomId,
+                    wsList: room.map(_ => _[0]),
+                    count: room.length
                 })
             })
             return roomInfo
         }
         else {
             return ids.map(roomId => {
-                return { roomId, count: this.roomPool.get(roomId)?.length ?? 0 }
+                const _room = this.roomPool.get(roomId)
+                return {
+                    roomId,
+                    wsList: _room?.map(_ => _[0]) ?? [],
+                    count: _room?.length ?? 0
+                }
             })
         }
     }
@@ -107,7 +119,7 @@ abstract class WSController {
         const room = this.roomPool.get(roomId)
         if(!room) return false
         else {
-            room.forEach(ws => {
+            room.forEach(([ _, ws ]) => {
                 ws.send(JSON.stringify(body))
             })
         }
@@ -124,13 +136,13 @@ abstract class WSController {
         // 新建房间
         if(!room) {
             this.wsPool.set(wsId, [ roomId, ws ])
-            this.roomPool.set(roomId, [ ws ])
+            this.roomPool.set(roomId, [ [ wsId, ws ] ])
             return true
         }
         // 正常加入
         else if(room.length < 4) {
             this.wsPool.set(wsId, [ roomId, ws ])
-            room.push(ws)
+            room.push([ wsId, ws ])
             return true
         }
         // 已满员
@@ -159,7 +171,7 @@ abstract class WSController {
             // 不止一个 => 仅删除人员
             else {
                 this.roomPool.get(wsInPool[0])?.filter(ws => {
-                    return ws !== wsInPool[1]
+                    return ws[0] !== wsInPool[0]
                 })
             }
 

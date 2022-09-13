@@ -1,6 +1,7 @@
 export const enum WSChannel {
     WSId = 'wsId',
     Chat = 'chat',
+    Start = 'start',
 }
 
 // region 客户端 消息
@@ -19,7 +20,8 @@ export type MSG_WS_template<CMD extends WSChannel, DATA = any> = {
 }
 export type MSG_WS_wsId = MSG_WS_template<WSChannel.WSId, undefined>
 export type MSG_WS_chat = MSG_WS_template<WSChannel.Chat, string>
-export type MSG_WS = MSG_WS_wsId | MSG_WS_chat
+export type MSG_WS_start = MSG_WS_template<WSChannel.Start, undefined>
+export type MSG_WS = MSG_WS_wsId | MSG_WS_chat | MSG_WS_start
 // endregion
 
 // region 服务端 消息
@@ -31,3 +33,4 @@ export type MSG_ROOM_template<CMD extends WSChannel, DATA = any> = {
     data: DATA
 }
 export type MSG_ROOM = MSG_ROOM_template<WSChannel.Chat, string>
+    // | MSG_ROOM_template<WSChannel.Start, undefined>
