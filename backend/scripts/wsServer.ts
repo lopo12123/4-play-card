@@ -96,7 +96,7 @@ abstract class WSController {
             return true
         }
         // 正常加入
-        else if(room.length >= 4) {
+        else if(room.length < 4) {
             this.wsPool.set(wsId, [ roomId, ws ])
             room.push(ws)
             return true
@@ -130,6 +130,8 @@ abstract class WSController {
                     return ws !== wsInPool[1]
                 })
             }
+
+            this.wsPool.delete(wsId)
         }
     }
 
@@ -166,7 +168,6 @@ abstract class WSSController {
             const _wsId = req.url?.match(/(?<=wsId=)[0-9a-z-]+/)?.[0] ?? UUID()
             const _roomId = req.url?.match(/(?<=roomId=)[0-9a-z-]+/)?.[0] ?? UUID()
 
-            WSController.addWS(_wsId, _roomId, ws)
             colorfulStdout([
                 { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
                 { message: ' [wss] ', fontColor: FontColorEnums.green },
@@ -174,50 +175,64 @@ abstract class WSSController {
                 { message: ' connecting', fontColor: FontColorEnums.green }
             ])
 
-            // 消息处理
-            ws.on('message', (msg) => {
-                const msgObj = JSON.parse(msg.toString()) as IMSG
-                // 建立连接后返回 wsId、roomId
-                if(msgObj.cmd === 'wsId') {
-                    ws.send(JSON.stringify({
-                        cmd: 'wsId',
-                        payload: {
-                            wsId: _wsId,
-                            roomId: _roomId
-                        }
-                    } as IMSG_wsId))
-                }
-                // 其他所有的消息处理
-                else {
-                    WSMsgController.solve(
-                        JSON.parse(msg.toString()), _wsId,
-                        (msgObj) => {
-                            ws.send(JSON.stringify(msgObj))
-                        }
-                    )
-                }
-            })
+            // 是否成功加入
+            const ifEnter = WSController.addWS(_wsId, _roomId, ws)
 
-            // 错误处理
-            ws.on('error', err => {
+            if(!ifEnter) {
                 colorfulStdout([
                     { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
                     { message: ' [wss] ', fontColor: FontColorEnums.red },
                     { message: _wsId, fontColor: FontColorEnums.blue },
-                    { message: ` Error: ${ err.message }`, fontColor: FontColorEnums.red }
+                    { message: ' disconnected [REFUSE: room is full]', fontColor: FontColorEnums.red }
                 ])
-            })
+                ws.close()
+            }
+            else {
+                // 消息处理
+                ws.on('message', (msg) => {
+                    const msgObj = JSON.parse(msg.toString()) as IMSG
+                    // 建立连接后返回 wsId、roomId
+                    if(msgObj.cmd === 'wsId') {
+                        ws.send(JSON.stringify({
+                            cmd: 'wsId',
+                            payload: {
+                                wsId: _wsId,
+                                roomId: _roomId
+                            }
+                        } as IMSG_wsId))
+                    }
+                    // 其他所有的消息处理
+                    else {
+                        WSMsgController.solve(
+                            JSON.parse(msg.toString()), _wsId,
+                            (msgObj) => {
+                                ws.send(JSON.stringify(msgObj))
+                            }
+                        )
+                    }
+                })
 
-            // 断开连接
-            ws.on('close', () => {
-                WSController.closeWS(_wsId)
-                colorfulStdout([
-                    { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
-                    { message: ' [wss] ', fontColor: FontColorEnums.yellow },
-                    { message: _wsId, fontColor: FontColorEnums.blue },
-                    { message: ' disconnect', fontColor: FontColorEnums.yellow }
-                ])
-            })
+                // 错误处理
+                ws.on('error', err => {
+                    colorfulStdout([
+                        { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
+                        { message: ' [wss] ', fontColor: FontColorEnums.red },
+                        { message: _wsId, fontColor: FontColorEnums.blue },
+                        { message: ` Error: ${ err.message }`, fontColor: FontColorEnums.red }
+                    ])
+                })
+
+                // 断开连接
+                ws.on('close', () => {
+                    WSController.closeWS(_wsId)
+                    colorfulStdout([
+                        { message: `[${ formatDate() }]`, fontColor: FontColorEnums.yellow },
+                        { message: ' [wss] ', fontColor: FontColorEnums.yellow },
+                        { message: _wsId, fontColor: FontColorEnums.blue },
+                        { message: ' disconnect', fontColor: FontColorEnums.yellow }
+                    ])
+                })
+            }
         })
     }
 
