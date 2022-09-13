@@ -2,25 +2,23 @@ import { Server as HttpServer } from "http";
 import { Server as WSServer, WebSocket, WebSocketServer } from "ws";
 import { v4 as UUID } from "uuid";
 import { colorfulStdout, FontColorEnums, formatDate } from "./misc";
-import { MSG_ROOM, MSG_WS, MSG_WS_wsId } from "@mj/shared/wsEv";
+import { MSG_ROOM, MSG_WS, MSG_WS_wsId, WSChannel } from "@mj/shared/wsEv";
 
 /**
  * @description websocket 消息处理
  */
 abstract class WSMsgController {
-    public static solve(msg: MSG_WS) {
+    public static solve(msg: Exclude<MSG_WS, MSG_WS_wsId>) {
         const { wsId, roomId, data } = msg.payload
 
-        WSController.broadcast(roomId, { sourceId: wsId, msg: data })
-
-        // switch(msg.cmd) {
-        //     case 'wsId':
-        //         send({ cmd: 'wsId', payload: { wsId, } } as MSG_WS_wsId)
-        //         break
-        //     default:
-        //
-        //         break
-        // }
+        switch(msg.cmd) {
+            case WSChannel.Chat:
+                WSController.broadcast(roomId, { sourceId: wsId, data: data })
+                break
+            default:
+                // never
+                break
+        }
     }
 }
 
@@ -228,9 +226,9 @@ abstract class WSSController {
                         const msgObj = JSON.parse(msg.toString()) as MSG_WS
 
                         // 建立连接后返回 wsId、roomId
-                        if(msgObj.cmd === 'wsId') {
+                        if(msgObj.cmd === WSChannel.WSId) {
                             ws.send(JSON.stringify({
-                                cmd: 'wsId',
+                                cmd: WSChannel.WSId,
                                 payload: {
                                     wsId: _wsId,
                                     roomId: _roomId
