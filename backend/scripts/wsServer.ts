@@ -4,8 +4,6 @@ import { v4 as UUID } from "uuid";
 import { colorfulStdout, FontColorEnums, formatDate } from "./misc";
 import { MSG_ROOM, MSG_WS, MSG_WS_wsId, WSChannel } from "@mj/shared/wsEv";
 
-type WSPair = [ string, WebSocket ]
-
 /**
  * @description websocket 消息处理
  */
@@ -104,10 +102,10 @@ abstract class WSController {
      */
     public static send(wsId: string, body: any) {
         const ws = this.wsPool.get(wsId)
-        if(!ws) return false
-        else {
+        if(!ws)
+            return false
+        else
             ws[1].send(JSON.stringify(body))
-        }
     }
 
     /**
@@ -127,6 +125,7 @@ abstract class WSController {
 
     // endregion
 
+    // region ws 增删查
     /**
      * @description 存储新连接(如果存在则自动断开旧连接)
      * @return 房间id
@@ -188,6 +187,8 @@ abstract class WSController {
         })
         this.wsPool.clear()
     }
+
+    // endregion
 }
 
 /**
